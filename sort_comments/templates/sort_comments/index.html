@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flow comments</title>
+    <style>
+        /*html {*/
+        /*    margin: 0;*/
+        /*    padding: 0;*/
+        /*}*/
+
+        body {
+            width: 100%;
+            min-width: 400px;
+            max-width: 1200px;
+            margin: 0 auto;
+            /*padding: 0;*/
+        }
+
+        pre {
+            white-space: pre-wrap;
+            margin-bottom: 0;
+        }
+
+        blockquote {
+            margin: 12px 0;
+            padding: 0 12px;
+            border-left: 2px solid #aac7d6;
+            background: 0 0;
+        }
+
+        img {
+            /*width:100%;*/
+            /*max-width:600px;*/
+            /*height: auto;*/
+            /*max-height:800px;*/
+            max-width: 100%;
+            max-height: 480px;
+        }
+    </style>
+</head>
+<body>
+{% if comments %}
+{% for comment in comments %}
+<li>
+    <strong>
+        <a target="_blank" href="{{ comment.user_url }}">{{ comment.username }}</a>
+        <span class='score'>{{ comment.score }}</span>,
+        {{ comment.time }}<a target="_blank" href="{{ comment.comment_url }}"> Перейти к комментарию</a>
+    </strong>
+    <pre>{{ comment.raw_comment|safe }}</pre>
+    {% if comment.content_url %}
+    <!--    <a target="_blank" href="{{ comment.content_url }}">{{ comment.content_url }}</a>-->
+    <img src="{{ comment.content_url }}">
+    {% endif %}
+</li>
+{% endfor %}
+{% endif %}
+</body>
+</html>
