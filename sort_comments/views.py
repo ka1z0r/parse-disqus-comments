@@ -12,9 +12,9 @@ def index(request):
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
-    driver.get("https://the-flow.ru/releases/oxxxymiron-krasota-i-urodstvo")
+    driver.get("https://the-flow.ru/releases/stromae-multitude")
 
-    wait = WebDriverWait(driver, 300)
+    wait = WebDriverWait(driver, 10)
     wait.until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[title='Disqus']")))
 
     while True:
@@ -38,12 +38,19 @@ def index(request):
             comment["username"] = article.find("span", {"class": "author publisher-anchor-color"}).get_text()
             comment["user_url"] = article.find("span", {"class": "author publisher-anchor-color"}).a['href']
             comment["time"] = ",".join(article.find("a", {"class": "time-ago"}).get("title").split(",")[1:])
-            comment["raw_comment"] = str(article.find("div", {"data-role": "message"})).split('<a class="media-button')[0]
-            # comment["raw_comment"] = str(article.find("div", {"class": "post-message"}))
             content = article.find("div", {"data-role": "message"}).find("a", {"class": "media-button-expand"})
             if content:
-                comment["content_url"] = content.get("href")
+                if content.get("href").startswith("https://www.youtube.com/"):
+                    comment["youtube_url"] = content.get("href").split("https://www.youtube.com/watch?v=")[1].split('&')[0]
+                    comment["content_url"] = None
+                else:
+                    comment["youtube_url"] = None
+                    comment["content_url"] = content.get("href")
+                comment["raw_comment"] = str(article.find("div", {"data-role": "message"})).split(
+                    '<div class="media-container media-mode-deferred')[0]
             else:
+                comment["raw_comment"] = str(article.find("div", {"data-role": "message"}))
+                comment["youtube_url"] = None
                 comment["content_url"] = None
             comment["comment_url"] = article.find("a", {"class": "time-ago"}).get("href")
             comment["score"] = int(article.find("span", {"data-role": "likes"}).get_text())
