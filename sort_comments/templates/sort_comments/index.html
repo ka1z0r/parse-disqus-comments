@@ -27,9 +27,20 @@
             max-width: 100%;
             max-height: 480px;
         }
+
+        form {
+            margin: 30px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="flow_url" value="{{ flow_url }}" size="60" required pattern="^https://the-flow\.ru/(\w+(-\w+)*/?)+"
+           placeholder="https://the-flow.ru/features/vse-recenzii-na-oksimirona-krasota-i-urodstvo" >
+    <button type="submit">Submit</button>
+</form>
 {% if comments %}
 {% for comment in comments %}
 <li>

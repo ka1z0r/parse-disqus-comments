@@ -8,14 +8,28 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # Create your views here.
 def index(request):
+    if request.method == 'POST':
+        flow_url = request.POST['flow_url']
+    else:
+        flow_url = "https://the-flow.ru/features/vse-recenzii-na-oksimirona-krasota-i-urodstvo"
+        return render(request, "sort_comments/index.html", {'flow_url': flow_url})
+
     options = webdriver.ChromeOptions()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    options.headless = True
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
-    driver.get("https://the-flow.ru/releases/stromae-multitude")
+    driver.get(flow_url)
 
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 15)
     wait.until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR, "iframe[title='Disqus']")))
+
+    # changing wait time depending on comments count
+    comment_count = int(driver.find_element(By.CLASS_NAME, "comment-count").text.split(" Comments")[0])
+    if comment_count < 101:
+        wait = WebDriverWait(driver, 5)
+    elif comment_count > 1000:
+        wait = WebDriverWait(driver, 30)
 
     while True:
         try:
@@ -61,4 +75,4 @@ def index(request):
     all_comments.sort(key=lambda d: d['score'], reverse=True)
     print(len(all_comments))
 
-    return render(request, "sort_comments/index.html", {'comments': all_comments})
+    return render(request, "sort_comments/index.html", {'comments': all_comments, 'flow_url': flow_url})
